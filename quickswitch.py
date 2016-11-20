@@ -39,21 +39,21 @@ except ImportError:
 __version__ = "2.7.0"
 
 workspace_number_re = re.compile("^(?P<number>\d+)(?P<name>.*)")
-default_dmenu_command = "dmenu -b -i -l 20"
+default_rofi_command = "rofi -dmenu -location 6 -no-case-sensitive " \
+  "-lines 20 -width 100"
 window_class_ignore_list = []
 follow = False
 follow_if_empty = False
 
 
-def check_dmenu():
-    """Check if dmenu is available."""
-    return bool(shutil.which("dmenu"))
+def check_rofi():
+    """Check if rofi is available."""
+    return bool(shutil.which("rofi"))
 
 
-def dmenu(options, dmenu):
-    """Call dmenu with a list of options."""
-
-    cmd = subprocess.Popen(dmenu,
+def rofi(options, rofi):
+    """Call rofi with a list of options."""
+    cmd = subprocess.Popen(rofi,
                            shell=True,
                            stdin=subprocess.PIPE,
                            stdout=subprocess.PIPE,
@@ -430,20 +430,20 @@ def main():
                           "urgency hint set")
     mutgrp_3.add_argument("-l", "--launch", default=False,
                           action="store_true",
-                          help="if input to dmenu doesn't match any "
+                          help="if input to rofi doesn't match any "
                           "given option, send the input to shell for "
                           "interpretation")
 
     parser.add_argument("-C", "--ignore-classes", default="",
                         help="comma separated list of window classes "
                         "to ignore")
-    parser.add_argument("-d", "--dmenu", default=default_dmenu_command,
-                        help="dmenu command, executed within a shell")
+    parser.add_argument("-d", "--dmenu", default=default_rofi_command,
+                        help="rofi -dmenu command, executed within a shell")
     parser.add_argument("-i", "--insensitive", default=False,
                         action="store_true",
                         help="make regexps case insensitive")
     parser.add_argument("-o", "--prompt", default=False, action="store_true",
-                        help="show a prompt in dmenu describing the "
+                        help="show a prompt in rofi describing the "
                         "action to perform")
 
     args = parser.parse_args()
@@ -454,7 +454,7 @@ def main():
     follow_if_empty = args.followifempty
 
     # jumping to the next empty workspaces doesn't require going through all
-    # the stuff below, as we don't need to call dmenu etc, so we just call it
+    # the stuff below, as we don't need to call rofi etc, so we just call it
     # here and exit if the appropriate flag was given.
     if args.empty or args.nextempty:
         target_ws = first_empty() if args.empty else next_empty()
@@ -507,8 +507,8 @@ def main():
             sys.exit(os.EX_SOFTWARE)
         sys.exit(os.EX_OK)
 
-    if args.dmenu == default_dmenu_command and not check_dmenu():
-        print("quickswitch requires dmenu.")
+    if args.dmenu == default_rofi_command and not check_rofi():
+        print("quickswitch requires rofi.")
         print("Please install it using your distribution's package manager.")
         sys.exit(os.EX_UNAVAILABLE)
 
@@ -542,13 +542,13 @@ def main():
     dmenu_prompt_args = args.dmenu
     if args.prompt:
         dmenu_prompt_args += " -p '{}'".format(dmenu_prompt)
-    target = dmenu(lookup.keys(), dmenu_prompt_args)
+    target = rofi(lookup.keys(), dmenu_prompt_args)
     ws_id = lookup.get(target)
 
     if not ws_id and args.workspaces:
         # For workspace actions, we want to enable users to create new
         # workspaces. Easily done by discarding the lookup result
-        # and just use what dmenu handed us to begin with.
+        # and just use what rofi handed us to begin with.
         ws_id = target
 
     if ws_id:
