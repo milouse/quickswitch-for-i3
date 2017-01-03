@@ -39,8 +39,7 @@ except ImportError:
 __version__ = "2.7.0"
 
 workspace_number_re = re.compile("^(?P<number>\d+)(?P<name>.*)")
-default_rofi_command = "rofi -dmenu -location 6 -no-case-sensitive " \
-  "-lines 20 -width 100"
+default_rofi_command = "rofi -dmenu -location 6 -no-case-sensitive -width 100"
 window_class_ignore_list = []
 follow = False
 follow_if_empty = False
