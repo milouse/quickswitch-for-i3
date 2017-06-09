@@ -248,6 +248,8 @@ def create_lookup_table(windows):
     """
     rename_nonunique(windows)
     lookup = {}
+    urgent_win = []
+    focused_win = None
     for window in windows:
         win_name = window.get("name")
         win_id = window.get("window")
@@ -274,6 +276,13 @@ def create_lookup_table(windows):
             # add "(win_id)" as suffix in attempt to make unique
             win_name = "{} ({})".format(win_name, str(win_id))
         lookup[win_name] = win_id
+        if window.get("urgent"):
+            urgent_win.append(win_name)
+        if window.get("focused"):
+            focused_win = win_name
+
+    lookup["__urgent_win__"] = urgent_win
+    lookup["__focused_win__"] = focused_win
     return lookup
 
 
@@ -539,9 +548,23 @@ def main():
 
     lookup = lookup_func()
     dmenu_prompt_args = args.dmenu
+    if unit == "window":
+        urgent_wins = lookup.pop("__urgent_win__", None)
+        focused_win = lookup.pop("__focused_win__", None)
+        lookup_names = list(lookup.keys())
+        if focused_win is not None:
+            dmenu_prompt_args += " -a {}".format(
+                lookup_names.index(focused_win))
+
+        if urgent_wins is not None and len(urgent_wins) > 0:
+            urgent_idx = [lookup_names.index(win_t) for win_t in urgent_wins]
+            dmenu_prompt_args += " -u {}".format(",".join(urgent_idx))
+    else:
+        lookup_names = lookup.keys()
+
     if args.prompt:
         dmenu_prompt_args += " -p '{}'".format(dmenu_prompt)
-    target = rofi(lookup.keys(), dmenu_prompt_args)
+    target = rofi(lookup_names, dmenu_prompt_args)
     ws_id = lookup.get(target)
 
     if not ws_id and args.workspaces:
