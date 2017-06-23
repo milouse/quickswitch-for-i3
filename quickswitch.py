@@ -553,7 +553,8 @@ def main():
     if unit == "window":
         lookup_names = list(lookup.keys())
         if focused_win is not None:
-            dmenu_prompt_args += " -a {}".format(
+            dmenu_prompt_args += " -a {} -selected-row {}".format(
+                lookup_names.index(focused_win),
                 lookup_names.index(focused_win))
 
         if urgent_wins is not None and len(urgent_wins) > 0:
