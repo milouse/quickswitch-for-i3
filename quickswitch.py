@@ -548,9 +548,9 @@ def main():
 
     lookup = lookup_func()
     dmenu_prompt_args = args.dmenu
+    urgent_wins = lookup.pop("__urgent_win__", None)
+    focused_win = lookup.pop("__focused_win__", None)
     if unit == "window":
-        urgent_wins = lookup.pop("__urgent_win__", None)
-        focused_win = lookup.pop("__focused_win__", None)
         lookup_names = list(lookup.keys())
         if focused_win is not None:
             dmenu_prompt_args += " -a {}".format(
