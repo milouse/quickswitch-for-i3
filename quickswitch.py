@@ -558,7 +558,8 @@ def main():
                 lookup_names.index(focused_win))
 
         if urgent_wins is not None and len(urgent_wins) > 0:
-            urgent_idx = [lookup_names.index(win_t) for win_t in urgent_wins]
+            urgent_idx = [str(lookup_names.index(win_t))
+                          for win_t in urgent_wins]
             dmenu_prompt_args += " -u {}".format(",".join(urgent_idx))
     else:
         lookup_names = lookup.keys()
